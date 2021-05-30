@@ -7,22 +7,22 @@ export default (data1, data2) => {
 
   const keys = _.union(Object.keys(data1), Object.keys(data2)).sort();
   const diff = keys.reduce((acc, key) => {
-    if (!_.has(data1, key)) {
-      return [...acc, `${rowAddPrefix}${key}: ${data2[key]}`];
+    const rows = [...acc];
+    const firstHas = _.has(data1, [key]);
+    const secondHas = _.has(data2, [key]);
+
+    if (firstHas && secondHas && data1[key] === data2[key]) {
+      rows.push(`${rowSharePrefix}${key}: ${data1[key]}`);
+    } else if (firstHas && secondHas) {
+      rows.push(`${rowRemovePrefix}${key}: ${data1[key]}`);
+      rows.push(`${rowAddPrefix}${key}: ${data2[key]}`);
+    } else if (firstHas) {
+      rows.push(`${rowRemovePrefix}${key}: ${data1[key]}`);
+    } else {
+      rows.push(`${rowAddPrefix}${key}: ${data2[key]}`);
     }
 
-    if (!_.has(data2, key)) {
-      return [...acc, `${rowRemovePrefix}${key}: ${data1[key]}`];
-    }
-
-    if (data1[key] === data2[key]) {
-      return [...acc, `${rowSharePrefix}${key}: ${data1[key]}`];
-    }
-
-    const row1 = `${rowRemovePrefix}${key}: ${data1[key]}`;
-    const row2 = `${rowAddPrefix}${key}: ${data2[key]}`;
-
-    return [...acc, row1, row2];
+    return rows;
   }, []);
 
   diff.unshift('{');
