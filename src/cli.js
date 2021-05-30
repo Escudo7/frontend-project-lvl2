@@ -1,7 +1,7 @@
 import { Command } from 'commander/esm.mjs';
 import { readFileSync } from 'fs';
 import { extname } from 'path';
-import genDiff from './genDiff'
+import genDiff from './genDiff';
 
 const version = '0.0.1';
 

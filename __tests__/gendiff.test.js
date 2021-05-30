@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals';
+import { readFileSync } from 'fs';
 import genDiff from '../src/genDiff.js';
-import { readFileSync } from "fs";
 
 test('genDiff', () => {
   const content1 = JSON.parse(readFileSync('__fixtures__/json1.json'));
