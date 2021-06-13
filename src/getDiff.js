@@ -4,7 +4,7 @@ import parser from './parsers.js';
 import generateDiff from './generateDiff.js';
 import getRenderer from './formatters/index.js';
 
-export default (path1, path2, format) => {
+export default (path1, path2, format = 'stylish') => {
   const content1 = readFileSync(path1);
   const content2 = readFileSync(path2);
   const contentParsed1 = parser(content1, extname(path1));
