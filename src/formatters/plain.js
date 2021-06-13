@@ -39,5 +39,5 @@ const renderer = (diffList, parentsList) => (
 export default (diff) => {
   const rows = renderer(diff, []);
 
-  return `\n${rows.join('\n')}\n`;
+  return `${rows.join('\n')}`;
 };
