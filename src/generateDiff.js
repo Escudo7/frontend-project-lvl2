@@ -17,7 +17,8 @@ const generateDifferenceNode = (name, data1, data2, firstHas) => (
 );
 
 const generate = (data1, data2) => {
-  const keys = _.union(Object.keys(data1), Object.keys(data2)).sort();
+  const keys = _.union(Object.keys(data1), Object.keys(data2));
+  const keysSorted = _.sortBy(keys);
   const createTree = (name) => {
     const firstHas = _.has(data1, [name]);
     const secondHas = _.has(data2, [name]);
@@ -27,7 +28,7 @@ const generate = (data1, data2) => {
       : generateDifferenceNode(name, data1, data2, firstHas);
   };
 
-  return _.flatMapDeep(keys, createTree);
+  return _.flatMapDeep(keysSorted, createTree);
 };
 
 export default generate;
