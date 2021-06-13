@@ -69,5 +69,5 @@ export default (diff) => {
   rows.unshift('{');
   rows.push('}');
 
-  return `\n${rows.join('\n')}\n`;
+  return `${rows.join('\n')}`;
 };
