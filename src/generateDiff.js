@@ -2,28 +2,34 @@ import _ from 'lodash';
 
 const generate = (data1, data2) => {
   const keys = _.union(Object.keys(data1), Object.keys(data2)).sort();
-  const diff = keys.reduce((acc, key) => {
-    const item = { name: key };
-    const firstHas = _.has(data1, [key]);
-    const secondHas = _.has(data2, [key]);
+  const createTree = (name) => {
+    const firstHas = _.has(data1, [name]);
+    const secondHas = _.has(data2, [name]);
 
     if (firstHas && !secondHas) {
-      item.oldValue = data1[key];
-    } else if (!firstHas && secondHas) {
-      item.newValue = data2[key];
-    } else if (_.isEqual(data1[key], data2[key])) {
-      item.value = data1[key];
-    } else if (!_.isObject(data1[key]) || !_.isObject(data2[key])) {
-      item.oldValue = data1[key];
-      item.newValue = data2[key];
-    } else {
-      item.children = generate(data1[key], data2[key]);
+      return { name, oldValue: data1[name] };
     }
 
-    return [...acc, item];
-  }, []);
+    if (!firstHas && secondHas) {
+      return { name, newValue: data2[name] };
+    }
 
-  return diff;
+    if (_.isEqual(data1[name], data2[name])) {
+      return { name, value: data1[name] };
+    }
+
+    if (!_.isObject(data1[name]) || !_.isObject(data2[name])) {
+      return {
+        name,
+        oldValue: data1[name],
+        newValue: data2[name],
+      };
+    }
+
+    return { name, children: generate(data1[name], data2[name]) };
+  };
+
+  return _.flatMapDeep(keys, createTree);
 };
 
 export default generate;
