@@ -2,18 +2,10 @@ import _ from 'lodash';
 import yaml from 'js-yaml';
 
 const parsers = {
-  yml(content) {
-    return this.yamlParser(content);
-  },
-  yaml(content) {
-    return this.yamlParser(content);
-  },
-  yamlParser(content) {
-    return yaml.load(content);
-  },
-  json(content) {
-    return JSON.parse(content);
-  },
+  yml: (content) => parsers.yamlParser(content),
+  yaml: (content) => parsers.yamlParser(content),
+  yamlParser: (content) => yaml.load(content),
+  json: (content) => JSON.parse(content),
 };
 
 export default (content, extension) => {

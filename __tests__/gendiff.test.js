@@ -1,16 +1,12 @@
-import { test, expect, beforeAll } from '@jest/globals';
+import { test, expect } from '@jest/globals';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import getDiff from '../src/getDiff.js';
 
-let getPath;
-
-beforeAll(() => {
-  const currentPath = fileURLToPath(import.meta.url);
-  const currentDir = dirname(currentPath);
-  getPath = (fileName) => `${currentDir}/../__fixtures__/${fileName}`;
-});
+const currentPath = fileURLToPath(import.meta.url);
+const currentDir = dirname(currentPath);
+const getPath = (fileName) => `${currentDir}/../__fixtures__/${fileName}`;
 
 test('jsonDiffStylish', () => {
   const path1 = getPath('json1.json');

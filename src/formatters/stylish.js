@@ -9,12 +9,11 @@ const renderObject = (obj, depth) => {
 
   return _.flatMapDeep(keys, (key) => {
     if (_.isObject(obj[key])) {
-      const data = [];
-      data.push(`${rowSharePrefix.repeat(depth)}${key}: {`);
-      data.push(renderObject(obj[key], depth + 1));
-      data.push(`${rowSharePrefix.repeat(depth)}}`);
+      const startRow = `${rowSharePrefix.repeat(depth)}${key}: {`;
+      const middleRows = renderObject(obj[key], depth + 1);
+      const endRow = `${rowSharePrefix.repeat(depth)}}`;
 
-      return data;
+      return [startRow, middleRows, endRow];
     }
 
     return `${rowSharePrefix.repeat(depth)}${key}: ${obj[key]}`;
@@ -22,12 +21,11 @@ const renderObject = (obj, depth) => {
 };
 
 const renderObjectDiff = (name, value, depth, rowPrefix) => {
-  const data = [];
-  data.push(`${rowSharePrefix.repeat(depth - 1)}${rowPrefix}${name}: {`);
-  data.push(renderObject(value, depth + 1));
-  data.push(`${rowSharePrefix.repeat(depth)}}`);
+  const startRow = `${rowSharePrefix.repeat(depth - 1)}${rowPrefix}${name}: {`;
+  const middleRows = renderObject(value, depth + 1);
+  const endRow = `${rowSharePrefix.repeat(depth)}}`;
 
-  return data;
+  return [startRow, middleRows, endRow];
 };
 
 const renderKeyDiff = (name, value, depth, rowPrefix) => (
@@ -38,36 +36,41 @@ const renderKeyDiff = (name, value, depth, rowPrefix) => (
 
 const renderer = (diffList, depth) => {
   const renderItem = (item) => {
-    const newData = [];
-
     if (_.has(item, 'children')) {
-      newData.push(`${rowSharePrefix.repeat(depth)}${item.name}: {`);
-      newData.push(renderer(item.children, depth + 1));
-      newData.push(`${rowSharePrefix.repeat(depth)}}`);
-    }
+      const startRow = `${rowSharePrefix.repeat(depth)}${item.name}: {`;
+      const middleRows = renderer(item.children, depth + 1);
+      const endRow = `${rowSharePrefix.repeat(depth)}}`;
 
-    if (_.has(item, 'oldValue')) {
-      newData.push(renderKeyDiff(item.name, item.oldValue, depth, rowRemovePrefix));
-    }
-
-    if (_.has(item, 'newValue')) {
-      newData.push(renderKeyDiff(item.name, item.newValue, depth, rowAddPrefix));
+      return [startRow, middleRows, endRow];
     }
 
     if (_.has(item, 'value')) {
-      newData.push(renderKeyDiff(item.name, item.value, depth, rowSharePrefix));
+      return renderKeyDiff(item.name, item.value, depth, rowSharePrefix);
     }
 
-    return newData;
+    if (_.has(item, 'oldValue') && _.has(item, 'newValue')) {
+      const oldRow = renderKeyDiff(item.name, item.oldValue, depth, rowRemovePrefix);
+      const newRow = renderKeyDiff(item.name, item.newValue, depth, rowAddPrefix);
+
+      return [oldRow, newRow];
+    }
+
+    if (_.has(item, 'oldValue')) {
+      return renderKeyDiff(item.name, item.oldValue, depth, rowRemovePrefix);
+    }
+
+    if (_.has(item, 'newValue')) {
+      return renderKeyDiff(item.name, item.newValue, depth, rowAddPrefix);
+    }
+
+    return [];
   };
 
   return _.flatMapDeep(diffList, renderItem);
 };
 
 export default (diff) => {
-  const rows = renderer(diff, 1);
-  rows.unshift('{');
-  rows.push('}');
+  const rows = ['{', ...renderer(diff, 1), '}'];
 
   return `${rows.join('\n')}`;
 };
