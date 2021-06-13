@@ -6,7 +6,7 @@ common:
   setting5:
     key5: value5
   setting6:
-    key: value,
+    key: value
     ops: vops
     doge:
       wow: so much
